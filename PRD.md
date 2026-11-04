@@ -74,6 +74,7 @@
 
 **articles**
 - id, sourceName, url (unique), titleOriginal, titleKo, summaryKo
+- author (nullable, 원문 기사 작성자)
 - categoryId (FK → categories, 삭제 시 null), publishedAt, createdAt
 - notionPageUrl (nullable)
 

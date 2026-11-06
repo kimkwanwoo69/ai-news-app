@@ -16,16 +16,20 @@ export function NewsBoard({
 }) {
   const [filter, setFilter] = useState<Filter>("all");
 
+  // DB에 '기타' 카테고리가 있으면 그 칩이 카테고리 없는 기사도 함께 보여 준다.
+  const etc = categories.find((c) => c.name === "기타");
+
   const chips: { key: Filter; label: string }[] = [
     { key: "all", label: "전체" },
     ...categories.map((c) => ({ key: c.id as Filter, label: c.name })),
-    { key: "none", label: "기타" },
+    ...(etc ? [] : [{ key: "none" as Filter, label: "기타" }]),
   ];
 
   const visible = articles.filter((a) => {
     if (filter === "all") return true;
     if (filter === "none") return a.categoryId === null;
-    return a.categoryId === filter;
+    if (a.categoryId === filter) return true;
+    return filter === etc?.id && a.categoryId === null;
   });
 
   return (

@@ -20,6 +20,7 @@ export type DashboardArticle = {
 export type DashboardCategory = {
   id: number;
   name: string;
+  description: string;
 };
 
 // 최신순: 발행일이 없는 기사는 수집 시각으로 대신 정렬한다.
@@ -53,7 +54,11 @@ export async function listArticles(): Promise<DashboardArticle[]> {
 
 export async function listCategories(): Promise<DashboardCategory[]> {
   return db
-    .select({ id: categories.id, name: categories.name })
+    .select({
+      id: categories.id,
+      name: categories.name,
+      description: categories.description,
+    })
     .from(categories)
     .orderBy(asc(categories.id));
 }

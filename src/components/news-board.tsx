@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import type { DashboardArticle, DashboardCategory } from "@/db/queries";
+import { CategoryBar, type Filter } from "./category-bar";
 import { NewsCard } from "./news-card";
-
-// 'all' = 전체, 'none' = 카테고리 없음('기타'), number = 카테고리 id
-type Filter = "all" | "none" | number;
 
 const PAGE_SIZE = 9;
 
@@ -38,12 +36,6 @@ export function NewsBoard({
   // DB에 '기타' 카테고리가 있으면 그 칩이 카테고리 없는 기사도 함께 보여 준다.
   const etc = categories.find((c) => c.name === "기타");
 
-  const chips: { key: Filter; label: string }[] = [
-    { key: "all", label: "전체" },
-    ...categories.map((c) => ({ key: c.id as Filter, label: c.name })),
-    ...(etc ? [] : [{ key: "none" as Filter, label: "기타" }]),
-  ];
-
   const visible = articles.filter((a) => {
     if (filter === "all") return true;
     if (filter === "none") return a.categoryId === null;
@@ -57,26 +49,11 @@ export function NewsBoard({
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        {chips.map((chip) => {
-          const selected = filter === chip.key;
-          return (
-            <button
-              key={chip.key}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => setFilter(chip.key)}
-              className={`rounded-full border px-4 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:py-1.5 ${
-                selected
-                  ? "border-primary bg-primary text-white"
-                  : "border-border bg-surface text-muted hover:border-primary hover:text-primary"
-              }`}
-            >
-              {chip.label}
-            </button>
-          );
-        })}
-      </div>
+      <CategoryBar
+        categories={categories}
+        filter={filter}
+        onSelect={setFilter}
+      />
 
       {visible.length === 0 ? (
         <EmptyState

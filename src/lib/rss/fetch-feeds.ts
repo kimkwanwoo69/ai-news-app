@@ -1,6 +1,6 @@
 import Parser from "rss-parser";
 import type { NewArticle } from "@/db/schema";
-import { FEEDS, WINDOW_MS } from "./feeds";
+import { FEEDS, PER_FEED_LIMIT, WINDOW_MS } from "./feeds";
 
 const parser = new Parser({ timeout: 10_000 });
 
@@ -36,7 +36,7 @@ export async function fetchRecentArticles(
           continue;
         }
 
-        // 번역·요약은 이후 단계에서 Claude가 덮어쓴다. 지금은 원문을 임시로 채운다.
+        // 번역·요약·분류는 ingest 단계에서 Claude가 덮어쓴다. 지금은 원문을 임시로 채운다.
         articles.push({
           sourceName: feed.name,
           url,
@@ -47,7 +47,11 @@ export async function fetchRecentArticles(
           publishedAt,
         });
       }
-      return articles;
+      // 최신순으로 정렬해 피드당 상한만큼만 남긴다.
+      articles.sort(
+        (a, b) => b.publishedAt!.getTime() - a.publishedAt!.getTime(),
+      );
+      return articles.slice(0, PER_FEED_LIMIT);
     }),
   );
 

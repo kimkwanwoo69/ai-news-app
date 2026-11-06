@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `PRD.md` (Korean) is the source of truth for scope, data model, env vars and the implementation order (section 11). Currently only the stock `create-next-app` scaffold exists (Next.js 16, React 19, TypeScript, Tailwind 4, App Router, `src/` dir, alias `@/*`). None of the PRD's other dependencies (Clerk, Drizzle/Neon, `@anthropic-ai/sdk`, `rss-parser`, Notion MCP) are installed yet — add them step by step following the PRD order.
 
+## UI guide
+
+`ui.md` (Korean) is the UI style guide: color tokens, layout, category bar, news card and screen states (Tailwind CSS). Read it before writing or changing any UI, and update it first when the design changes.
+
 ## Commands
 
 - `npm run dev` — dev server

@@ -14,7 +14,7 @@ export function NewsCard({ article }: { article: DashboardArticle }) {
     : null;
 
   return (
-    <article className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
+    <article className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-5 transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
       <div className="flex items-center justify-between gap-2">
         <span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary-soft-text">
           {article.categoryName ?? "기타"}

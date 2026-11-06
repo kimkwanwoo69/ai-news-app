@@ -14,7 +14,14 @@ export default function Home() {
   }, [isLoaded, isSignedIn, router]);
 
   if (!isLoaded || isSignedIn) {
-    return <main className="flex flex-1" />;
+    return (
+      <main
+        role="status"
+        className="flex flex-1 items-center justify-center text-sm text-muted"
+      >
+        불러오는 중…
+      </main>
+    );
   }
 
   return (

@@ -42,13 +42,13 @@
 
 ## 4. 레이아웃
 
-- 전체: `body`는 `min-h-full flex flex-col`. 콘텐츠 폭은 `mx-auto w-full max-w-6xl px-6`.
+- 전체: `body`는 `min-h-full flex flex-col`. 콘텐츠 폭은 `mx-auto w-full max-w-6xl px-4 sm:px-6` (모바일 좌우 여백 16px, 태블릿부터 24px).
 - 구조 (위에서 아래로)
   1. **헤더** — 앱 이름 `AI 뉴스 수집기`, 오른쪽에 `뉴스 가져오기` 버튼과 `UserButton`
   2. **카테고리 바** — 뉴스 카드 목록 바로 위
   3. **뉴스 카드 그리드**
-- 헤더는 `sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur`.
-- 카드 그리드: `grid gap-5 sm:grid-cols-2 lg:grid-cols-3` (모바일 1열 → 태블릿 2열 → 데스크톱 3열).
+- 헤더는 `sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur`. 오류 화면에서도 유지되도록 `dashboard/layout.tsx`에 둔다.
+- 카드 그리드: `grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3` (모바일 1열 → 태블릿 2열 → 데스크톱 3열).
 - 카테고리 바와 그리드 사이 간격은 `mb-6`.
 
 ```
@@ -69,7 +69,7 @@
 
 - 컨테이너: `mb-6 flex flex-wrap items-center gap-2` (좁은 화면에서는 줄바꿈).
 - 항목 순서: `전체` → DB의 카테고리들 → `기타` → **`+ 카테고리` 추가 버튼**.
-- 카테고리 칩(공통): `rounded-full border px-4 py-1.5 text-sm transition-colors`
+- 카테고리 칩(공통): `rounded-full border px-4 py-2 text-sm transition-colors sm:py-1.5` (모바일 높이 약 40px, 태블릿부터 32px)
   - 선택됨: `border-primary bg-primary text-white`
   - 선택 안 됨: `border-border bg-surface text-muted hover:border-primary hover:text-primary`
 - **추가 버튼**은 칩과 같은 크기이되 점선 테두리로 구분한다.
@@ -94,7 +94,7 @@
 ```
 
 - 카드 컨테이너:
-  `flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md`
+  `flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm transition sm:p-5 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md`
 - 카테고리 배지: `rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary-soft-text`. 분류가 없으면 `기타`.
 - 제목은 원문 기사로 연결되는 링크(`target="_blank" rel="noopener noreferrer"`), 호버 시 `text-primary`.
 - 푸터: `mt-auto border-t border-border pt-4`. 카드 높이가 달라도 푸터가 아래에 정렬되도록 한다.
@@ -111,9 +111,9 @@
 ## 7. 상태별 화면
 
 - **로그아웃 상태:** 중앙 정렬. 앱 이름(`text-3xl font-semibold text-primary`), 안내 문구(`text-muted`), `로그인`(채움 파랑) / `회원가입`(`border-border bg-surface text-primary`) 버튼 두 개. 모든 페이지가 로그인 필수다.
-- **빈 상태(뉴스 없음):** `py-20 text-center text-muted`. 안내 문구 `아직 가져온 뉴스가 없습니다. '뉴스 가져오기'를 눌러 보세요.`
-- **필터 결과 없음:** `이 카테고리에 해당하는 뉴스가 없습니다.`
-- **로딩:** 가져오는 동안 `뉴스 가져오기` 버튼을 비활성화하고 `가져오는 중…`으로 바꾼다. 카드 자리는 `animate-pulse` 스켈레톤을 쓴다.
+- **빈 상태(뉴스 없음):** 카테고리 칩은 숨기고, 점선 테두리 안내 카드(`rounded-2xl border border-dashed border-border bg-surface py-14 text-center`)를 보여 준다. 파란 원형 아이콘, 제목 `아직 수집한 뉴스가 없어요`, 설명 `뉴스를 가져오면 이곳에 카드로 정리돼요.` 순서. `뉴스 가져오기` 버튼이 생기면 안내 카드 안에 같은 버튼을 둔다.
+- **필터 결과 없음:** 같은 안내 카드에 제목 `이 카테고리에 해당하는 뉴스가 없어요`와 `전체 보기` 버튼(채움 파랑)을 둔다.
+- **로딩:** 가져오는 동안 `뉴스 가져오기` 버튼을 비활성화하고 `가져오는 중…`으로 바꾼다. 카드 자리는 실제 카드와 같은 구조의 스켈레톤을 쓴다(`motion-safe:animate-pulse`, 높이가 달라 화면이 출렁이지 않게). 컨테이너에 `role="status"`와 `sr-only` 문구 `뉴스를 불러오는 중…`을 둔다. 로그인 확인 중인 `/`에는 `불러오는 중…`을 보여 준다.
 - **결과 안내:** 가져오기가 끝나면 `신규 N건, 실패 M건`을 토스트 또는 헤더 아래 배너(`bg-primary-soft text-primary-soft-text rounded-lg px-4 py-2 text-sm`)로 보여 준다.
 - **오류:** RSS·Claude·Notion 호출 실패는 앱이 멈추지 않게 하고 사용자에게 보이는 오류 메시지로 알린다. 오류 배너는 파란 계열과 구분되도록 `bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300`를 쓴다.
 
@@ -123,7 +123,7 @@
 - 선택된 카테고리 칩에 `aria-pressed="true"`를 지정한다.
 - 키보드 포커스가 보이게 한다: `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`.
 - 본문 글자와 배경의 대비는 WCAG AA(4.5:1) 이상을 유지한다. `muted`는 본문이 아닌 보조 정보에만 쓴다.
-- 클릭 영역은 최소 높이 32px 이상(`py-1.5` + `text-sm`), 모바일에서는 헤더 버튼을 `h-10` 이상으로 한다.
+- 클릭 영역은 모바일에서 40px 이상(칩 `py-2`, 버튼 `h-10`), 태블릿부터는 최소 32px.
 - 가로 스크롤이 생기지 않아야 한다. 긴 제목·URL은 `break-words`로 처리한다.
 
 ## 9. 컴포넌트 구성 (예정)
@@ -134,6 +134,6 @@
 | `CategoryBar` | `src/components/category-bar.tsx` | 카테고리 칩 목록 + 추가 버튼 |
 | `AddCategoryDialog` | `src/components/add-category-dialog.tsx` | 카테고리 이름·설명 입력 |
 | `NewsCard` | `src/components/news-card.tsx` | 기사 한 장 표시, Notion 저장 버튼 |
-| `NewsGrid` | `src/components/news-grid.tsx` | 카드 그리드·빈 상태·로딩 |
+| `NewsBoard` | `src/components/news-board.tsx` | 카테고리 칩 필터, 카드 그리드, 빈 상태 |
 
 스타일 변경은 먼저 이 문서와 `globals.css`의 토큰을 고치고, 컴포넌트에서는 토큰 클래스만 사용한다.

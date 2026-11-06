@@ -7,6 +7,8 @@ import { NewsCard } from "./news-card";
 // 'all' = 전체, 'none' = 카테고리 없음('기타'), number = 카테고리 id
 type Filter = "all" | "none" | number;
 
+const PAGE_SIZE = 9;
+
 export function NewsBoard({
   articles,
   categories,
@@ -14,7 +16,14 @@ export function NewsBoard({
   articles: DashboardArticle[];
   categories: DashboardCategory[];
 }) {
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilterState] = useState<Filter>("all");
+  const [page, setPage] = useState(1);
+
+  // 필터를 바꾸면 1페이지로 돌아간다.
+  function setFilter(next: Filter) {
+    setFilterState(next);
+    setPage(1);
+  }
 
   // 기사가 하나도 없으면 필터 칩은 의미가 없으므로 안내 화면만 보여 준다.
   if (articles.length === 0) {
@@ -41,6 +50,10 @@ export function NewsBoard({
     if (a.categoryId === filter) return true;
     return filter === etc?.id && a.categoryId === null;
   });
+
+  // 새로 가져오기 등으로 개수가 줄어도 범위를 벗어나지 않게 보정한다.
+  const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
 
   return (
     <>
@@ -80,13 +93,70 @@ export function NewsBoard({
           }
         />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-          {visible.map((article) => (
-            <NewsCard key={article.id} article={article} />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+            {visible
+              .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+              .map((article) => (
+                <NewsCard key={article.id} article={article} />
+              ))}
+          </div>
+          {totalPages > 1 && (
+            <nav
+              aria-label="페이지 이동"
+              className="mt-8 flex flex-wrap items-center justify-center gap-2"
+            >
+              <PageButton
+                label="이전"
+                disabled={currentPage === 1}
+                onClick={() => setPage(currentPage - 1)}
+              />
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <PageButton
+                  key={n}
+                  label={String(n)}
+                  current={n === currentPage}
+                  onClick={() => setPage(n)}
+                />
+              ))}
+              <PageButton
+                label="다음"
+                disabled={currentPage === totalPages}
+                onClick={() => setPage(currentPage + 1)}
+              />
+            </nav>
+          )}
+        </>
       )}
     </>
+  );
+}
+
+function PageButton({
+  label,
+  onClick,
+  current,
+  disabled,
+}: {
+  label: string;
+  onClick: () => void;
+  current?: boolean;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-current={current ? "page" : undefined}
+      className={`h-10 min-w-10 rounded-full border px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-40 sm:h-8 sm:min-w-8 ${
+        current
+          ? "border-primary bg-primary text-white"
+          : "border-border bg-surface text-muted hover:border-primary hover:text-primary disabled:hover:border-border disabled:hover:text-muted"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 

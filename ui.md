@@ -76,7 +76,12 @@
   - 클래스: `rounded-full border border-dashed border-primary/50 px-4 py-1.5 text-sm text-primary transition-colors hover:bg-primary-soft`
   - 라벨: `+ 카테고리`
   - 클릭하면 이름·설명을 입력하는 작은 모달(또는 인라인 폼)이 열린다. 설명은 AI 분류 힌트로 쓰이므로 입력란 안내문에 그 취지를 적는다.
-- 카테고리를 삭제하면 해당 기사는 `기타`로 표시된다는 점을 삭제 확인 문구에 명시한다.
+- 항목 순서에서 `기타`는 항상 추가 버튼 바로 앞(카테고리 맨 뒤)에 둔다. 새로 추가한 카테고리는 `기타` 앞에 들어간다.
+- **수정·삭제:** 선택된 카테고리 칩 바로 옆에 연필 아이콘 버튼(`aria-label="{이름} 카테고리 편집"`)이 나타난다. 누르면 추가와 같은 모달이 이름·설명 채운 상태로 열리고, 하단에 `삭제` 버튼이 있다. `전체`와 `기타`는 편집·삭제할 수 없다.
+- 이름은 필수(30자 이하)이며 중복할 수 없다. 설명은 200자 이하. 중복·검증 오류는 모달 안에 오류 배너(`bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300`)로 보여 준다.
+- 수정은 **이후 수집부터** 분류에 반영되고, 이미 저장된 기사는 다시 분류하지 않는다. 모달 안내문에 적는다.
+- 카테고리를 삭제하면 해당 기사는 `기타`로 표시된다는 점을 삭제 확인 문구에 명시한다. 삭제는 모달 안에서 한 번 더 확인(`삭제할까요?` → `삭제` / `취소`)한다.
+- 모달은 네이티브 `<dialog>`(`showModal`)를 쓴다: Esc로 닫히고 포커스가 갇힌다. 패널 `w-[calc(100%-2rem)] max-w-md rounded-2xl border border-border bg-surface p-5 text-foreground`, 배경 `backdrop:bg-black/40`.
 
 ## 6. 뉴스 카드
 
@@ -104,7 +109,7 @@
 
 | 상태 | 표시 | 스타일 |
 |---|---|---|
-| 미저장 | `Notion에 저장` | `rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-hover` |
+| 미저장 | `뉴스 저장` | `rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-hover` |
 | 저장 중 | `저장 중…` | 위와 같고 `disabled:opacity-50` |
 | 저장됨(`notionPageUrl` 있음) | `저장됨` | `bg-primary-soft text-primary-soft-text`, 클릭 시 Notion 페이지를 새 탭으로 열기. 중복 저장 방지 |
 

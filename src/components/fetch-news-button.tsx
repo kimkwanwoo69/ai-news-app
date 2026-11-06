@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
@@ -7,6 +8,7 @@ type Message = { kind: "ok" | "error"; text: string };
 
 export function FetchNewsButton() {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [, startTransition] = useTransition();
   const [message, setMessage] = useState<Message | null>(null);
@@ -15,19 +17,33 @@ export function FetchNewsButton() {
     setLoading(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/news/fetch", { method: "POST" });
+      // 세션 쿠키는 수명이 짧아 만료됐을 수 있으므로, 요청 직전에 최신 토큰을 받아 보낸다.
+      const token = await getToken();
+      const res = await fetch("/api/news/fetch", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setMessage({
           kind: "error",
-          text: data.error ?? "뉴스를 가져오지 못했어요.",
+          text:
+            res.status === 401
+              ? "로그인이 만료됐어요. 새로고침 후 다시 로그인해 주세요."
+              : (data.error ?? "뉴스를 가져오지 못했어요."),
         });
         return;
       }
-      const failed = data.failedFeeds?.length ?? 0;
+      const failedFeeds: string[] = data.failedFeeds ?? [];
+      const failed: number = data.failed ?? 0;
+      const feedNote =
+        failedFeeds.length > 0 ? ` (피드 실패: ${failedFeeds.join(", ")})` : "";
       setMessage({
-        kind: failed > 0 && data.added === 0 ? "error" : "ok",
-        text: `신규 ${data.added}건, 실패 ${failed}건`,
+        kind:
+          data.added === 0 && (failed > 0 || failedFeeds.length > 0)
+            ? "error"
+            : "ok",
+        text: `신규 ${data.added}건, 실패 ${failed}건${feedNote}`,
       });
       startTransition(() => router.refresh());
     } catch {

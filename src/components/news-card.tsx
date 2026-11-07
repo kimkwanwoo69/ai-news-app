@@ -18,6 +18,8 @@ export function NewsCard({ article }: { article: DashboardArticle }) {
   const { getToken } = useAuth();
   const [, startTransition] = useTransition();
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleted, setDeleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // 저장 직후 router.refresh()가 끝나기 전에도 '저장됨'으로 보이게 한다.
   const [savedUrl, setSavedUrl] = useState<string | null>(null);
@@ -54,13 +56,67 @@ export function NewsCard({ article }: { article: DashboardArticle }) {
     }
   }
 
+  async function handleDelete() {
+    setDeleting(true);
+    setError(null);
+    try {
+      const token = await getToken();
+      const res = await fetch(`/api/articles/${article.id}`, {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(
+          res.status === 401
+            ? "로그인이 만료됐어요. 새로고침 후 다시 로그인해 주세요."
+            : (data.error ?? "뉴스를 삭제하지 못했어요."),
+        );
+        return;
+      }
+      setDeleted(true);
+      startTransition(() => router.refresh());
+    } catch {
+      setError("네트워크 오류가 발생했어요.");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  // 삭제 직후 router.refresh()가 끝나기 전에도 카드를 바로 숨긴다.
+  if (deleted) return null;
+
   return (
     <article className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-5 transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
       <div className="flex items-center justify-between gap-2">
         <span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary-soft-text">
           {article.categoryName ?? "기타"}
         </span>
-        <span className="truncate text-xs text-muted">{article.sourceName}</span>
+        <div className="flex min-w-0 items-center gap-1">
+          <span className="truncate text-xs text-muted">
+            {article.sourceName}
+          </span>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            aria-label={`"${article.titleKo}" 뉴스 삭제`}
+            title="삭제"
+            className="-mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-300"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              className="size-4"
+            >
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">

@@ -1,4 +1,4 @@
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { asc, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "./index";
 import { articles, categories } from "./schema";
 
@@ -50,6 +50,12 @@ export async function listArticles(): Promise<DashboardArticle[]> {
     ...row,
     publishedAt: row.publishedAt ? row.publishedAt.toISOString() : null,
   }));
+}
+
+// DB에 저장된 전체 기사 수 (필터와 무관).
+export async function countArticles(): Promise<number> {
+  const [row] = await db.select({ count: count() }).from(articles);
+  return row?.count ?? 0;
 }
 
 export async function listCategories(): Promise<DashboardCategory[]> {

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { NewsBoard } from "@/components/news-board";
-import { listArticles, listCategories } from "@/db/queries";
+import { countArticles, listArticles, listCategories } from "@/db/queries";
 
 export const metadata = {
   title: "대시보드 | AI 뉴스 수집기",
@@ -23,12 +23,20 @@ async function DashboardContent() {
   const { userId } = await auth();
   if (!userId) redirect("/");
 
-  const [articles, categories] = await Promise.all([
+  const [articles, categories, total] = await Promise.all([
     listArticles(),
     listCategories(),
+    countArticles(),
   ]);
 
-  return <NewsBoard articles={articles} categories={categories} />;
+  return (
+    <>
+      <p className="mb-4 inline-flex items-center rounded-full bg-primary-soft px-3 py-1 text-sm font-medium text-primary-soft-text">
+        총 {total}개의 뉴스
+      </p>
+      <NewsBoard articles={articles} categories={categories} />
+    </>
+  );
 }
 
 // 실제 카드와 같은 구조로 만들어 로딩이 끝날 때 화면이 출렁이지 않게 한다.

@@ -18,6 +18,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Typecheck: `npx tsc --noEmit`
 - No test runner is configured.
 
+## Custom commands
+
+- `/news-workflow <branch-name>` (`.claude/commands/news-workflow.md`) — feature-development workflow: check that you're on `main` (warn and ask before switching) → create the branch (if no name is given, ask what is being built and suggest a lowercase-hyphen name) → announce start and recap the stack/conventions from this file → on "완료"/"done", show changed files, propose a commit message, commit after confirmation and merge into `main` (`--no-ff`) → summarize the work.
+
 ## Next.js version warning
 
 `AGENTS.md` states this Next.js version has breaking changes versus common training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing Next.js code, and heed deprecation notices.

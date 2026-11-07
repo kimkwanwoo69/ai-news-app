@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import type { DashboardArticle, DashboardCategory } from "@/db/queries";
 import { CategoryBar, type Filter } from "./category-bar";
 import { NewsCard } from "./news-card";
@@ -16,11 +16,30 @@ export function NewsBoard({
 }) {
   const [filter, setFilterState] = useState<Filter>("all");
   const [page, setPage] = useState(1);
+  // draft: 입력 중인 값, query: '검색'을 눌러 적용된 값
+  const [draft, setDraft] = useState("");
+  const [query, setQuery] = useState("");
 
   // 필터를 바꾸면 1페이지로 돌아간다.
   function setFilter(next: Filter) {
     setFilterState(next);
     setPage(1);
+  }
+
+  function applySearch(value: string) {
+    setQuery(value.trim());
+    setPage(1);
+  }
+
+  function submitSearch(e: FormEvent) {
+    e.preventDefault();
+    applySearch(draft);
+  }
+
+  function resetAll() {
+    setDraft("");
+    applySearch("");
+    setFilter("all");
   }
 
   // 기사가 하나도 없으면 필터 칩은 의미가 없으므로 안내 화면만 보여 준다.
@@ -36,7 +55,22 @@ export function NewsBoard({
   // DB에 '기타' 카테고리가 있으면 그 칩이 카테고리 없는 기사도 함께 보여 준다.
   const etc = categories.find((c) => c.name === "기타");
 
+  // 공백으로 나눈 단어를 모두 포함하는 기사만 남긴다(대소문자 무시).
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+
   const visible = articles.filter((a) => {
+    if (terms.length > 0) {
+      const text = [
+        a.titleKo,
+        a.titleOriginal,
+        a.summaryKo,
+        a.author ?? "",
+        a.sourceName,
+      ]
+        .join("\n")
+        .toLowerCase();
+      if (!terms.every((t) => text.includes(t))) return false;
+    }
     if (filter === "all") return true;
     if (filter === "none") return a.categoryId === null;
     if (a.categoryId === filter) return true;
@@ -49,6 +83,39 @@ export function NewsBoard({
 
   return (
     <>
+      <form
+        role="search"
+        onSubmit={submitSearch}
+        className="mb-4 flex gap-2"
+      >
+        <input
+          type="search"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="키워드로 뉴스 검색"
+          aria-label="뉴스 검색어"
+          className="h-10 min-w-0 flex-1 rounded-full border border-border bg-surface px-4 text-sm text-foreground placeholder:text-muted focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => {
+              setDraft("");
+              applySearch("");
+            }}
+            className="h-10 rounded-full border border-border bg-surface px-4 text-sm text-muted transition-colors hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            지우기
+          </button>
+        )}
+        <button
+          type="submit"
+          className="h-10 rounded-full bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          검색
+        </button>
+      </form>
+
       <CategoryBar
         categories={categories}
         filter={filter}
@@ -57,12 +124,20 @@ export function NewsBoard({
 
       {visible.length === 0 ? (
         <EmptyState
-          title="이 카테고리에 해당하는 뉴스가 없어요"
-          description="다른 카테고리를 고르거나 전체 뉴스를 확인해 보세요."
+          title={
+            query
+              ? "검색 결과가 없어요"
+              : "이 카테고리에 해당하는 뉴스가 없어요"
+          }
+          description={
+            query
+              ? `"${query}"에 맞는 뉴스를 찾지 못했어요. 다른 키워드로 검색해 보세요.`
+              : "다른 카테고리를 고르거나 전체 뉴스를 확인해 보세요."
+          }
           action={
             <button
               type="button"
-              onClick={() => setFilter("all")}
+              onClick={resetAll}
               className="h-10 rounded-full bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               전체 보기

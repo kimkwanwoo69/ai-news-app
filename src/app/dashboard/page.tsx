@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { CardSkeleton } from "@/components/card-skeleton";
 import { NewsBoard } from "@/components/news-board";
 import { countArticles, listArticles, listCategories } from "@/db/queries";
 
@@ -55,28 +56,6 @@ function DashboardSkeleton() {
             <CardSkeleton key={i} />
           ))}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function CardSkeleton() {
-  return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-2">
-        <div className="h-6 w-20 rounded-full bg-primary-soft" />
-        <div className="h-4 w-24 rounded bg-primary-soft" />
-      </div>
-      <div className="flex flex-col gap-2">
-        <div className="h-5 w-full rounded bg-primary-soft" />
-        <div className="h-5 w-2/3 rounded bg-primary-soft" />
-        <div className="h-3 w-1/2 rounded bg-primary-soft" />
-        <div className="mt-1 h-3 w-full rounded bg-primary-soft" />
-        <div className="h-3 w-full rounded bg-primary-soft" />
-        <div className="h-3 w-4/5 rounded bg-primary-soft" />
-      </div>
-      <div className="mt-auto border-t border-border pt-4">
-        <div className="h-4 w-28 rounded bg-primary-soft" />
       </div>
     </div>
   );

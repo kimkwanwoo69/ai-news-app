@@ -2,7 +2,8 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useFetching } from "./fetching-context";
 
 type Message = { kind: "ok" | "error"; text: string };
 
@@ -10,8 +11,15 @@ export function FetchNewsButton() {
   const router = useRouter();
   const { getToken } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<Message | null>(null);
+  const { setFetching } = useFetching();
+
+  // 요청 중이거나 목록을 갱신하는 동안 보드에 스켈레톤을 보여 준다.
+  const busy = loading || isPending;
+  useEffect(() => {
+    setFetching(busy);
+  }, [busy, setFetching]);
 
   async function handleClick() {
     setLoading(true);

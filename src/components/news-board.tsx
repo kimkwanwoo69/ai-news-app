@@ -3,9 +3,13 @@
 import { useState, type FormEvent } from "react";
 import type { DashboardArticle, DashboardCategory } from "@/db/queries";
 import { CategoryBar, type Filter } from "./category-bar";
+import { SkeletonCards } from "./card-skeleton";
+import { useFetching } from "./fetching-context";
 import { NewsCard } from "./news-card";
 
 const PAGE_SIZE = 9;
+const EMPTY_SKELETON_COUNT = 6; // 기사가 없을 때 보여 줄 스켈레톤 수
+const INSERT_SKELETON_COUNT = 3; // 기존 목록 앞에 끼울 스켈레톤 수
 
 export function NewsBoard({
   articles,
@@ -19,6 +23,7 @@ export function NewsBoard({
   // draft: 입력 중인 값, query: '검색'을 눌러 적용된 값
   const [draft, setDraft] = useState("");
   const [query, setQuery] = useState("");
+  const { fetching } = useFetching();
 
   // 필터를 바꾸면 1페이지로 돌아간다.
   function setFilter(next: Filter) {
@@ -44,6 +49,19 @@ export function NewsBoard({
 
   // 기사가 하나도 없으면 필터 칩은 의미가 없으므로 안내 화면만 보여 준다.
   if (articles.length === 0) {
+    if (fetching) {
+      return (
+        <div role="status" aria-live="polite">
+          <span className="sr-only">뉴스를 가져오는 중…</span>
+          <div
+            aria-hidden="true"
+            className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 motion-safe:animate-pulse"
+          >
+            <SkeletonCards count={EMPTY_SKELETON_COUNT} />
+          </div>
+        </div>
+      );
+    }
     return (
       <EmptyState
         title="아직 수집한 뉴스가 없어요"
@@ -83,11 +101,7 @@ export function NewsBoard({
 
   return (
     <>
-      <form
-        role="search"
-        onSubmit={submitSearch}
-        className="mb-4 flex gap-2"
-      >
+      <form role="search" onSubmit={submitSearch} className="mb-4 flex gap-2">
         <input
           type="search"
           value={draft}
@@ -146,7 +160,20 @@ export function NewsBoard({
         />
       ) : (
         <>
+          {fetching && (
+            <span role="status" className="sr-only">
+              뉴스를 가져오는 중…
+            </span>
+          )}
           <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+            {fetching && (
+              <div
+                aria-hidden="true"
+                className="contents motion-safe:animate-pulse"
+              >
+                <SkeletonCards count={INSERT_SKELETON_COUNT} />
+              </div>
+            )}
             {visible
               .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
               .map((article) => (

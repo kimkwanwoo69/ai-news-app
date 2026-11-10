@@ -35,10 +35,11 @@
 | 요소 | 클래스 |
 |---|---|
 | 앱 이름(헤더) | `text-lg font-bold text-primary` |
-| 카드 제목 | `text-lg font-semibold leading-snug` |
+| 카드 제목 | `text-lg font-semibold leading-snug tracking-tight text-balance` |
 | 카드 원문 제목 | `text-xs text-muted` (한 줄 말줄임) |
-| 카드 요약 | `text-sm leading-relaxed text-foreground/80` (최대 4줄) |
-| 메타 정보(출처·날짜·작성자) | `text-xs text-muted` |
+| 카드 요약 | `text-sm leading-7 text-pretty text-foreground/85` (최대 4줄) |
+| 카드 출처 | `text-xs font-medium text-foreground/80` |
+| 메타 정보(날짜·작성자) | `text-xs text-muted` |
 
 ## 4. 레이아웃
 
@@ -109,25 +110,29 @@
 
 ## 6. 뉴스 카드
 
-카드 한 장은 한 기사를 나타낸다. 구조는 위에서 아래로 **배지 → 제목 → 요약 → 푸터**.
+카드 한 장은 한 기사를 나타낸다. 구조는 위에서 아래로 **배지·날짜 → 제목 → 요약 → 푸터**.
 
 ```
 ┌──────────────────────────────┐
-│ [카테고리]        TechCrunch AI │  ← 상단: 카테고리 배지 · 출처
-│ 한국어 제목 (최대 2~3줄)         │
+│ [카테고리]     2026년 11월 5일 ✕ │  ← 상단: 카테고리 배지 · 날짜 · 삭제(호버 시)
+│ 한국어 제목 (최대 3줄)           │
 │ Original English title          │  ← 원문 제목(옅게, 한 줄)
 │ 한국어 요약 …(최대 4줄)          │
 │ ───────────────────────────── │
-│ 작성자 · 2026년 11월 5일  [저장] │  ← 푸터: 메타 · Notion 저장 버튼
+│ TechCrunch AI          [저장]   │  ← 푸터: 출처(굵게)·작성자(옅게) · 저장 버튼
+│ 작성자                          │
 └──────────────────────────────┘
 ```
 
 - 카드 컨테이너:
-  `flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm transition sm:p-5 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md`
+  `group relative flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm transition-[border-color,box-shadow,transform] duration-200 sm:p-5 hover:border-primary/40 hover:shadow-md motion-safe:hover:-translate-y-0.5`
+- **카드 전체가 클릭 영역.** 제목 링크에 `after:absolute after:inset-0`(stretched link)을 주어 카드 어디를 눌러도 원문이 열린다. 삭제·저장 버튼과 Notion 링크는 `relative z-10`으로 위에 둔다.
 - 카테고리 배지: `rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary-soft-text`. 분류가 없으면 `기타`.
-- 제목은 원문 기사로 연결되는 링크(`target="_blank" rel="noopener noreferrer"`), 호버 시 `text-primary`.
-- 푸터: `mt-auto border-t border-border pt-4`. 카드 높이가 달라도 푸터가 아래에 정렬되도록 한다.
+- 제목은 원문 기사로 연결되는 링크(`target="_blank" rel="noopener noreferrer"`). 카드에 호버(`group-hover`)하면 `text-primary`와 밑줄(`underline decoration-primary/40 underline-offset-4`)이 나타난다.
+- 삭제 버튼은 데스크톱(`sm:`)에서 평소 `opacity-0`, 카드 호버·포커스 시 `opacity-100`. 모바일·터치에서는 항상 보인다.
+- 푸터: `mt-auto border-t border-border pt-4`. 카드 높이가 달라도 푸터가 아래에 정렬되도록 한다. 왼쪽에 출처(굵게)와 작성자(옅게)를 세로로 쌓는다.
 - 작성자(`author`)가 없으면 해당 줄을 숨기고, 발행일(`publishedAt`)이 없으면 날짜도 숨긴다. 날짜는 `2026년 11월 5일` 형식.
+- 카드 호버 움직임은 `motion-safe:`로만 적용한다(움직임 줄이기 설정 존중).
 
 ### Notion 저장 버튼 상태
 

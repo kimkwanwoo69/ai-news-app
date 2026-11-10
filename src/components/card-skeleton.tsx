@@ -14,8 +14,12 @@ export function CardSkeleton() {
         <div className="h-3 w-full rounded bg-primary-soft" />
         <div className="h-3 w-4/5 rounded bg-primary-soft" />
       </div>
-      <div className="mt-auto border-t border-border pt-4">
-        <div className="h-4 w-28 rounded bg-primary-soft" />
+      <div className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-4">
+        <div className="flex flex-col gap-1.5">
+          <div className="h-3 w-24 rounded bg-primary-soft" />
+          <div className="h-3 w-16 rounded bg-primary-soft" />
+        </div>
+        <div className="h-8 w-20 rounded-full bg-primary-soft" />
       </div>
     </div>
   );

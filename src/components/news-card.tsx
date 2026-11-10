@@ -87,22 +87,24 @@ export function NewsCard({ article }: { article: DashboardArticle }) {
   if (deleted) return null;
 
   return (
-    <article className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-5 transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
+    <article className="group relative flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm transition-[border-color,box-shadow,transform] duration-200 hover:border-primary/40 hover:shadow-md sm:p-5 motion-safe:hover:-translate-y-0.5">
       <div className="flex items-center justify-between gap-2">
         <span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary-soft-text">
           {article.categoryName ?? "기타"}
         </span>
         <div className="flex min-w-0 items-center gap-1">
-          <span className="truncate text-xs text-muted">
-            {article.sourceName}
-          </span>
+          {date && (
+            <time dateTime={article.publishedAt!} className="text-xs text-muted">
+              {date}
+            </time>
+          )}
           <button
             type="button"
             onClick={handleDelete}
             disabled={deleting}
             aria-label={`"${article.titleKo}" 뉴스 삭제`}
             title="삭제"
-            className="-mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 dark:hover:bg-red-950 dark:hover:text-red-300"
+            className="relative z-10 -mr-1.5 flex size-8 shrink-0 items-center justify-center rounded-full text-muted transition-[opacity,color,background-color] hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 sm:opacity-0 sm:group-hover:opacity-100 dark:hover:bg-red-950 dark:hover:text-red-300"
           >
             <svg
               aria-hidden="true"
@@ -120,12 +122,12 @@ export function NewsCard({ article }: { article: DashboardArticle }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="break-words text-lg font-semibold leading-snug">
+        <h2 className="break-words text-lg font-semibold leading-snug tracking-tight text-balance">
           <a
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="underline decoration-transparent decoration-2 underline-offset-4 transition-colors after:absolute after:inset-0 after:rounded-2xl group-hover:text-primary group-hover:decoration-primary/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             {article.titleKo}
           </a>
@@ -133,18 +135,22 @@ export function NewsCard({ article }: { article: DashboardArticle }) {
         <p className="line-clamp-1 break-words text-xs text-muted">
           {article.titleOriginal}
         </p>
-        <p className="line-clamp-4 break-words text-sm leading-relaxed text-foreground/80">
+        <p className="mt-1 line-clamp-4 break-words text-sm leading-7 text-pretty text-foreground/85">
           {article.summaryKo}
         </p>
       </div>
 
       <div className="mt-auto flex flex-col gap-2 border-t border-border pt-4">
         <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0 text-xs text-muted">
+          <div className="min-w-0 text-xs">
+            <span className="block truncate font-medium text-foreground/80">
+              {article.sourceName}
+            </span>
             {article.author && (
-              <span className="block truncate">{article.author}</span>
+              <span className="block truncate text-muted">
+                {article.author}
+              </span>
             )}
-            {date && <time dateTime={article.publishedAt!}>{date}</time>}
           </div>
 
           {notionPageUrl ? (
@@ -152,7 +158,7 @@ export function NewsCard({ article }: { article: DashboardArticle }) {
               href={notionPageUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 rounded-full bg-primary-soft px-4 py-1.5 text-sm font-medium text-primary-soft-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="relative z-10 shrink-0 rounded-full bg-primary-soft px-4 py-1.5 text-sm font-medium text-primary-soft-text transition-colors hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               저장됨
             </a>
@@ -161,7 +167,7 @@ export function NewsCard({ article }: { article: DashboardArticle }) {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="shrink-0 rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
+              className="relative z-10 shrink-0 rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
             >
               {saving ? "저장 중…" : "뉴스 저장"}
             </button>

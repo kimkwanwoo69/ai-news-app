@@ -50,6 +50,7 @@
   3. **검색 바** — 카테고리 바 위
   4. **카테고리 바** — 뉴스 카드 목록 바로 위
   5. **뉴스 카드 그리드**
+  6. **푸터** — 화면 맨 아래 (5-3 참고)
 - 헤더는 `sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur`. 오류 화면에서도 유지되도록 `dashboard/layout.tsx`에 둔다.
 - 카드 그리드: `grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3` (모바일 1열 → 태블릿 2열 → 데스크톱 3열).
 - 카테고리 바와 그리드 사이 간격은 `mb-6`.
@@ -96,6 +97,17 @@
 - 클래스: `mb-4 inline-flex items-center rounded-full bg-primary-soft px-3 py-1 text-sm font-medium text-primary-soft-text` (카테고리 배지와 같은 옅은 파랑 톤, 강조는 늘리지 않는다).
 - 개수는 서버에서 DB `count(*)`로 조회한다. 뉴스를 가져오거나 삭제한 뒤 화면을 새로고침하면 갱신된다.
 - 개수가 0이어도 `총 0개의 뉴스`로 표시한다.
+
+## 5-3. 푸터
+
+화면 맨 아래에 저작권과 기술 표기를 한 줄로 둔다. 헤더와 같은 톤의 얇은 구분선만 쓰고 다른 장식은 없다.
+
+- 문구: `Copyright 2026 AI뉴스 수집기. Powered by Claude.`
+- 요소: `<footer>`, 클래스 `mt-auto border-t border-border bg-surface`. 안쪽 래퍼는 헤더와 같은 폭 `mx-auto w-full max-w-6xl px-4 py-6 sm:px-6`.
+- 글자: `text-xs text-muted`, 모바일에서는 가운데 정렬, 태블릿부터 `sm:text-left`.
+- 뉴스가 적어 화면이 비어도 푸터가 화면 아래에 붙도록 `mt-auto`를 쓴다(`body`가 `flex flex-col`).
+- 헤더가 있는 `dashboard/layout.tsx`에 두어 오류 화면에서도 유지된다. 로그인 전 화면에는 두지 않는다.
+- 링크가 없는 순수 텍스트라 호버·포커스 상태는 없다. `muted` 대비는 보조 정보 용도로만 쓴다.
 
 ## 5-1. 검색 바
 
@@ -165,6 +177,7 @@
 | 컴포넌트 | 위치 | 역할 |
 |---|---|---|
 | `Header` | `src/components/header.tsx` | 앱 이름, 뉴스 가져오기 버튼, `UserButton` |
+| `Footer` | `src/components/footer.tsx` | 저작권·기술 표기 |
 | `CategoryBar` | `src/components/category-bar.tsx` | 카테고리 칩 목록 + 추가 버튼 |
 | `AddCategoryDialog` | `src/components/add-category-dialog.tsx` | 카테고리 이름·설명 입력 |
 | `NewsCard` | `src/components/news-card.tsx` | 기사 한 장 표시, Notion 저장 버튼 |

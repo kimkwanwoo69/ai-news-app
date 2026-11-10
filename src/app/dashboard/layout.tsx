@@ -1,6 +1,7 @@
 import { UserButton } from "@clerk/nextjs";
 import { FetchingProvider } from "@/components/fetching-context";
 import { FetchNewsButton } from "@/components/fetch-news-button";
+import { Footer } from "@/components/footer";
 
 // 헤더를 레이아웃에 두어, 페이지가 오류로 대체되어도 앱 이름과 사용자 메뉴가 유지된다.
 export default function DashboardLayout({
@@ -20,6 +21,7 @@ export default function DashboardLayout({
         </div>
       </header>
       {children}
+      <Footer />
     </FetchingProvider>
   );
 }

@@ -111,3 +111,8 @@ src/
 
 - 한 번에 처리하는 기사 수와 수집 기간은 `src/lib/rss/feeds.ts`에서 조정합니다(피드당 최근 10건, 최근 24시간).
 - RSS, Claude, Notion 호출이 실패해도 앱은 멈추지 않고 화면에 오류 메시지를 보여 줍니다.
+
+## 사용한 플러그인
+
+- Frontend Design: UI 디자인 품질 향상
+- commit-commands: 깃 워크플로 자동화
